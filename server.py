@@ -23,6 +23,7 @@ def start_game():
     dealer_masked = game.get_dealer_masked()
     dealer_hand = game.get_dealer()
     natural_21 = game.natural_21_state()
+    player_count = game.sum(player_hand, True)
 
     return jsonify(
         {
@@ -30,6 +31,7 @@ def start_game():
             "dealer_masked": dealer_masked,
             "dealer_hand": dealer_hand,
             "natural_21": natural_21,
+            "player_count": player_count,
         }
     )
 
