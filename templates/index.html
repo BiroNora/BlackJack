@@ -52,6 +52,8 @@
                 "Dealer: " + JSON.stringify(data.dealer_masked);
               document.getElementById("player-hand").textContent =
                 "Player: " + JSON.stringify(data.player_hand);
+              document.getElementById("player-sum").textContent =
+                "Player sum: " + JSON.stringify(data.player_count);
               document.getElementById("start-button").disabled = true;
               if (data.show_game_data) {
                 updateDisplay(data);
