@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BlackJack</title>
+    <link
+      href="{{ url_for('static', filename='styles/style.css')}}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <h1>BLACKJACK</h1>
+
+    <button id="start-button">Start Game</button>
+    <div id="game-display" style="display: none">
+      <div id="masked-dealer-hand"></div>
+      <div id="dealer-hand"></div>
+      <div id="player-hand"></div>
+      <div id="message"></div>
+
+      <div id="player-sum"></div>
+      <div id="player-state"></div>
+
+      <div id="dealer-sum"></div>
+      <div id="dealer-state"></div>
+
+      <div id="winner"></div>
+      <div id="natural-21"></div>
+
+      <button id="hit-button">Hit</button>
+      <button id="stand-button">Stand</button>
+    </div>
+
+    <script>
+      document.getElementById("start-button").addEventListener("click", () => {
+        fetch("/api/start_game", { method: "POST" })
+          .then((response) => response.json())
+          .then((data) => {
+            reload();
+            if (data.natural_21) {
+              document.getElementById("masked-dealer-hand").textContent =
+                "Dealer : " + JSON.stringify(data.dealer_hand);
+              document.getElementById("player-hand").textContent =
+                "Player: " + JSON.stringify(data.player_hand);
+              document.getElementById("natural-21").textContent =
+                JSON.stringify(data.natural_21);
+              document.getElementById("hit-button").disabled = true;
+              document.getElementById("stand-button").disabled = true;
+            } else {
+              document.getElementById("masked-dealer-hand").textContent =
+                "Dealer: " + JSON.stringify(data.dealer_masked);
+              document.getElementById("player-hand").textContent =
+                "Player: " + JSON.stringify(data.player_hand);
+              document.getElementById("start-button").disabled = true;
+              if (data.show_game_data) {
+                updateDisplay(data);
+              }
+            }
+            document.getElementById("game-display").style.display = "block";
+          });
+      });
+
+      document.getElementById("hit-button").addEventListener("click", () => {
+        fetch("/api/hit", { method: "POST" })
+          .then((response) => response.json())
+          .then((data) => updateDisplay(data));
+      });
+
+      document.getElementById("stand-button").addEventListener("click", () => {
+        fetch("/api/stand", { method: "POST" })
+          .then((response) => response.json())
+          .then((data) => {
+            stand_by(data);
+            document.getElementById("hit-button").disabled = true;
+            document.getElementById("stand-button").disabled = true;
+            document.getElementById("start-button").disabled = false;
+          });
+      });
+
+      function updateDisplay(data) {
+        document.getElementById("masked-dealer-hand").textContent =
+          "Dealer: " + JSON.stringify(data.dealer_masked);
+        document.getElementById("player-hand").textContent =
+          "Player: " + JSON.stringify(data.player_hand);
+        document.getElementById("player-sum").textContent =
+          "Player Sum: " + JSON.stringify(data.player_count);
+      }
+
+      function stand_by(data) {
+        document.getElementById("masked-dealer-hand").textContent =
+          "Dealer: " + JSON.stringify(data.dealer_hand);
+        document.getElementById("dealer-sum").textContent =
+          "Dealer Sum: " + JSON.stringify(data.dealer_count);
+        document.getElementById("dealer-state").textContent =
+          "Dealer : " + JSON.stringify(data.dealer_state);
+        document.getElementById("player-hand").textContent =
+          "Player: " + JSON.stringify(data.player_hand);
+        document.getElementById("player-sum").textContent =
+          "Player Sum: " + JSON.stringify(data.player_count);
+        document.getElementById("player-state").textContent =
+          "Player : " + JSON.stringify(data.player_state);
+        document.getElementById("winner").textContent = JSON.stringify(
+          data.winner
+        );
+      }
+
+      function reload() {
+        document.getElementById("masked-dealer-hand").textContent = "";
+        document.getElementById("dealer-sum").textContent = "";
+        document.getElementById("dealer-state").textContent = "";
+        document.getElementById("player-hand").textContent = "";
+        document.getElementById("player-sum").textContent = "";
+        document.getElementById("player-state").textContent = "";
+        document.getElementById("winner").textContent = "";
+        document.getElementById("natural-21").textContent = "";
+        document.getElementById("hit-button").disabled = false;
+        document.getElementById("stand-button").disabled = false;
+      }
+
+      function initialize_game(self) {
+        self.player.set_player(self.deck.pop(0));
+        self.dealer.set_dealer(self.deck.pop(0));
+        self.player.set_player(self.deck.pop(0));
+        self.dealer.set_dealer(self.deck.pop(0));
+        self.dealer.get_dealer_masked();
+        self.player.get_player();
+      }
+    </script>
+  </body>
+</html>
