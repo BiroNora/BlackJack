@@ -19,10 +19,10 @@ def start_game():
     game.initialize_game()
     session["game"] = game.serialize()
 
-    player_hand = game.get_player()
-    dealer_masked = game.get_dealer_masked()
-    dealer_hand = game.get_dealer()
     natural_21 = game.natural_21_state()
+    dealer_masked = game.get_dealer_masked()
+    player_hand = game.get_player()
+    dealer_hand = game.get_dealer()
     player_count = game.sum(player_hand, True)
 
     return jsonify(
